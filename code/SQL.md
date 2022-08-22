@@ -1,4 +1,5 @@
-[本笔记为阿里云天池龙珠计划SQL训练营的学习内容，链接为：(https://tianchi.aliyun.com/specials/promotion/aicampsql)
+本笔记为阿里云天池龙珠计划SQL训练营的学习内容，[链接为](https://tianchi.aliyun.com/specials/promotion/aicampsql)
+
 ### 数据库管理系统（DBMS）
 层次数据库（Hierarchical Database, HDB）
 关系数据库（Relational Database, RDB）
