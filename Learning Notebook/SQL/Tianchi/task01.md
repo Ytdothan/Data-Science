@@ -42,7 +42,7 @@ XML数据库（Object Oriented Database, OODB）
 *NOT NULL*是非空约束，即该列必须输入数据。  
 *PRIMARY KEY*是主键约束，代表该列是唯一值，可以通过该列取出特定的行的数据。
 
-### 表的创建删除和更新
+### 表的创建、删除和更新
 ```
 #数据库的创建:CREATE DATABASE < 数据库名称 >
 # CREATE DATABASE shop;
@@ -58,8 +58,51 @@ create table product (
     primary key(product_id)
 )
 ```
+```
+# 更新数据
+# --修改所有的注册时间
+update product
+	set regist_date = '2009-10-10'
+# --仅修改部分商品的信息
+update product
+	set sale_price = sale_price * 10,
+	    purchase_price = purchase_price/2
+where product_type = '厨房用具'
+# --将商品编号为008的数据（圆珠笔）的等级日期更新为NULL
+update product
+	set regist_date = NULL
+where product_id = '0008'
+```
+### 向表中插入数据
+```
+# 对表进行全列insert时，可省略表名后列清单，这时 VALUES子句的值会默认按照从左到右的顺序赋给每一列。
+# --包含列清单
+insert into product (product_id,product_name,product_type,sale_price,purchase_price,regist_date) values ('0005','高压锅','厨房用具',6800,5000,'2009-01-15')
+# --省略列清单，多行insert
+insert into product values ('0001', 'T恤衫', '衣服', 1000, 500, '2009-09-20'), ('0002', '打孔器', 
+'办公用品', 500, 320, '2009-09-11'),
+('0003', '运动T恤', '衣服', 4000, 2800, NULL),
+('0004', '菜刀', '厨房用具', 3000, 2800, '2009-09-20'), ('0006', '叉子', '厨房用具', 500, NULL, '2009-09-20'), ('0007', '擦菜板', '厨房用具', 880, 790, '2008-04-28'), ('0008', '圆珠笔', '办公用品', 100, NULL, '2009-11-11')
 
+# INSERT 语句中想给某一列赋予 NULL 值时，可以直接在 VALUES子句的值清单中写入 NULL。想要插入 NULL 的列一定不能设置 NOT NULL 约束。
 
+#还可以向表中插入默认值（初始值）。可以通过在创建表的CREATE TABLE 语句中设置DEFAULT约束来设定默认值。
+create table productcopy
+(
+	product_id CHAR(4) NOT NULL, 
+     product_name VARCHAR(100) NOT NULL, 
+     product_type VARCHAR(32) NOT NULL, 
+     sale_price INTEGER default 0, 
+     purchase_price INTEGER, 
+     regist_date DATE, 
+     PRIMARY KEY(product_id)
+)
+
+# 使用INSERT … SELECT 语句从其他表复制数据
+ insert into productcopy(product_id,product_name,product_type,sale_price,purchase_price,regist_date)
+ select product_id,product_name,product_type,sale_price,purchase_price,regist_date
+ from product
+```
 
 
 
