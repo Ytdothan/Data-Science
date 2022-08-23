@@ -103,7 +103,26 @@ create table productcopy
  select product_id,product_name,product_type,sale_price,purchase_price,regist_date
  from product
 ```
+## 练习题
+```
+# 3.1 
+CREATE TABLE Addressbook(
+     regist_no integer NOT NULL, 
+     name VARCHAR(128) NOT NULL, 
+     address VARCHAR(256) NOT NULL, 
+     tel_no char(10), 
+     mail_address char(20), 
+     PRIMARY KEY(regist_no)
+ )
 
+#3.2
+alter table Addressbook add column postal_code char(8) not null
+
+#3.3
+drop table Addressbook
+
+#3.4 drop后无法恢复
+```
 
 
 
