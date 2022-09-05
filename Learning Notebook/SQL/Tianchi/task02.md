@@ -64,10 +64,29 @@ having profit >= 100
 - 想要计算值的种类时，可以在COUNT函数的参数中使用DISTINCT。  
 - 在聚合函数的参数中使用DISTINCT，可以删除重复数据。  
 
+**练习题**
+```
+1.
+# 1. SELECT → 2. FROM → 3. WHERE → 4. GROUP BY
 
+2. select product_type,
+sum(sale_price),
+sum(purchase_price)
+from product
+having sum(sale_price) > sum(purchase_price)*1.5
+group by product_type
 
-
-
+3.
+select *
+from product
+order by if(isnull(regist_date),0,1),regist_date desc, sale_price
+<!-- 
+【MySql 结论】
+order by colum asc 时，null默认被放在最前
+order by colum desc 时，null默认被放在最后
+ORDER BY IF(ISNULL(update_date),0,1) null被强制放在最前，不为null的按声明顺序[asc|desc]进行排序
+ORDER BY IF(ISNULL(update_date),1,0) null被强制放在最后，不为null的按声明顺序[asc|desc]进行排序 -->
+```
 
 
 
