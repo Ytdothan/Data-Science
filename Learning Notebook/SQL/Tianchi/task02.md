@@ -62,7 +62,20 @@ having profit >= 100
 - 聚合函数会将NULL排除在外。但COUNT(*)例外，并不会排除NULL。  
 - MAX/MIN函数几乎适用于所有数据类型的列。SUM/AVG函数只适用于数值类型的列。  
 - 想要计算值的种类时，可以在COUNT函数的参数中使用DISTINCT。  
-- 在聚合函数的参数中使用DISTINCT，可以删除重复数据。  
+- 在聚合函数的参数中使用DISTINCT，可以删除重复数据。    
+
+**Order By**    
+***MySql***  
+order by colum asc 时，null默认被放在最前  
+order by colum desc 时，null默认被放在最后  
+ORDER BY IF(ISNULL(colum),0,1) null被强制放在最前，不为null的按声明顺序[asc|desc]进行排序  
+ORDER BY IF(ISNULL(colum),1,0) null被强制放在最后，不为null的按声明顺序[asc|desc]进行排序   
+***Oracle***  
+order by colum asc 时，null默认被放在最后  
+order by colum desc 时，null默认被放在最前  
+nulls first，强制null放在最前，不为null的按声明顺序[asc|desc]进行排序  
+nulls last，强制null放在最后，不为null的按声明顺序[asc|desc]进行排序   
+
 
 **练习题**
 ```
@@ -80,12 +93,6 @@ group by product_type
 select *
 from product
 order by if(isnull(regist_date),0,1),regist_date desc, sale_price
-<!-- 
-【MySql 结论】
-order by colum asc 时，null默认被放在最前
-order by colum desc 时，null默认被放在最后
-ORDER BY IF(ISNULL(update_date),0,1) null被强制放在最前，不为null的按声明顺序[asc|desc]进行排序
-ORDER BY IF(ISNULL(update_date),1,0) null被强制放在最后，不为null的按声明顺序[asc|desc]进行排序 -->
 ```
 
 
