@@ -4,7 +4,7 @@
 
 视图是一个虚拟的表，不同于直接操作数据表，依据SELECT语句来创建，操作视图时会根据创建视图的SELECT语句生成一张虚拟表，然后在这张虚拟表上做SQL操作。
 
-**创建视图：**create view <视图名称>(<column1>,<column2>,...) as <select语句>
+**创建视图：** create view <视图名称>(<column1>,<column2>,...) as <select语句>
 
 ```mysql
 #创建基于单表的视图
@@ -21,9 +21,9 @@ from product,shop_product
 where product.product_id = shop_product.product_id
 ```
 
-**修改视图：**alter view <视图名称> as <select语句>
+**修改视图：** alter view <视图名称> as <select语句>
 
-**更新视图：**视图只是原表的一个窗口，对视图的操作就是对底层基础表的操作，更新视图时也只能更新透过窗口能看到的内容。如果包含以下结构的任意一种都是不可以被更新的：
+**更新视图：** 视图只是原表的一个窗口，对视图的操作就是对底层基础表的操作，更新视图时也只能更新透过窗口能看到的内容。如果包含以下结构的任意一种都是不可以被更新的：
 
 - 聚合函数 SUM()、MIN()、MAX()、COUNT() 等。
 - DISTINCT 关键字。
@@ -38,7 +38,7 @@ UPDATE productsum
  WHERE product_type = '办公用品'
 ```
 
-**删除视图：**drop view <视图名称> 
+**删除视图：** drop view <视图名称> 
 
 ## 子查询
 
@@ -66,11 +66,11 @@ SELECT product_type, product_name, sale_price
 
 > **书写顺序：**
 >
-> **SELECT**》FROM 》WHERE》GROUP BY》HAVE》ORDER BY
+> **SELECT** 》FROM 》WHERE》GROUP BY》HAVE》ORDER BY
 >
 > **执行顺序：**
 >
-> FROM 》WHERE》GROUP BY》HAVE》**SELECT**》ORDER BY
+> FROM 》WHERE》GROUP BY》HAVE》 **SELECT** 》ORDER BY
 
 [关联子查询执行逻辑](https://zhuanlan.zhihu.com/p/41844742?spm=5176.21852664.0.0.40d411b79rj82b)：
 
@@ -167,13 +167,14 @@ select * from AvgPriceByType;
   - expr用来指定从起始时间添加或减去的时间间隔，数值
 
   - type指示expr被解释的方式，type可以可以是以下值
-    - 主要使用红框中的值![img](https://api2.mubu.com/v3/document_image/342ef187-60e2-4b9e-a0bd-f763812759a3-9404487.jpg)
+    - 主要使用红框中的值  
+	![img](https://api2.mubu.com/v3/document_image/342ef187-60e2-4b9e-a0bd-f763812759a3-9404487.jpg)
 
-  - **`date_add`**函数对起始时间进行加操作，**`date_sub`**函数对起始时间进行减操作
+  - **`date_add`** 函数对起始时间进行加操作，**`date_sub`** 函数对起始时间进行减操作
 
   - 例如：`date_add('2021-08-03 23:59:59',interval 1 second)`返回2021-08-04 24:00:00，`date_sub('2021-08-03 23:59:59',interval 2 month)`返回2021-06-03 23:59:59
 
-- **datediff(date1,date2)**：计算两个日期之间间隔的天数
+- **datediff(date1,date2)** ：计算两个日期之间间隔的天数
 
   - datediff函数由date1-date2计算出间隔的时间，**只有date的日期部分参与计算**，时间不参与
 
@@ -210,9 +211,9 @@ select * from AvgPriceByType;
 > - IN
 > - EXISTS (只在右侧书写 1 个参数，该参数通常都会是一个子查询)
 
-- **`%`**是代表“零个或多个任意字符串”的特殊符号
+- **`%`** 是代表“零个或多个任意字符串”的特殊符号
 
-- **`_`**下划线匹配任意 1 个字符
+- **`_`** 下划线匹配任意 1 个字符
 
 ```mysql
 # 取出大阪在售商品的销售单价
