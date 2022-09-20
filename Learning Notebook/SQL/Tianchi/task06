@@ -1,0 +1,211 @@
+1.
+select m.TICKER_SYMBOL
+, m.END_DATE
+, T_REVENUE
+, T_COGS
+, N_INCOME
+, CLOSE_PRICE
+, INDIC_NAME_EN
+, VALUE
+FROM `market data` m left join `income statement` i
+on m.TICKER_SYMBOL = i.TICKER_SYMBOL and m.END_DATE=i.END_DATE
+left join `company operating` c
+on m.TICKER_SYMBOL = c.TICKER_SYMBOL and m.END_DATE=c.END_DATE
+WHERE m.TICKER_SYMBOL IN ('600383','600048')
+order by m.TICKER_SYMBOL,m.END_DATE
+
+2.
+select *
+, dense_rank() over (order by `citric acid`)citric_acid_rank
+from `winequality-red`
+where pH = 3.03
+
+3.
+select Merchant_id
+, sum(substring_index(Discount_rate,':',-1))sum_discount
+from ccf_offline_stage1_test_revised
+where Date_received between '2016-07-01' and '2016-07-31'
+group by Merchant_id
+order by sum_discount desc
+limit 1;
+select Merchant_id
+, count(1)count_discount
+from ccf_offline_stage1_test_revised
+where Date_received between '2016-07-01' and '2016-07-31'
+group by Merchant_id
+order by count_discount desc
+limit 1
+
+4.
+# 找出2015年用电最高峰日期
+select PERIOD_DATE
+, max(DATA_VALUE)max_value_2015
+from `macro industry`
+where year(PERIOD_DATE)=2015
+and  INDIC_ID = '2020101522'
+group by PERIOD_DATE
+order by max_value desc
+limit 1
+# 同期增长：2015-2014/2014
+select (max_value_2015 - value_2014)/value_2014
+from (select PERIOD_DATE
+, max(DATA_VALUE)max_value_2015
+from `macro industry`
+where year(PERIOD_DATE)=2015
+and  INDIC_ID = '2020101522'
+group by PERIOD_DATE
+order by max_value desc
+limit 1)value_2015
+left join
+(select PERIOD_DATE, MAX(DATA_VALUE)value_2014
+from `macro industry`
+where year(PERIOD_DATE)=2014
+and  INDIC_ID = '2020101522'
+group by PERIOD_DATE
+order by max_value desc
+)value_2014
+on year(value_2015.PERIOD_DATE)=year(value_2014.PERIOD_DATE)+1
+and month(value_2015.PERIOD_DATE)=month(value_2014.PERIOD_DATE)
+
+5.
+#总体弃用率
+select
+    sum(if(Date is null and Coupon_id is not null,1,0))/
+    sum(if(Coupon_id is not null,1,0)) as discard_rate
+from ccf_online_stage1_train
+where Date_received between '2016-06-01' and '2016-06-30'
+#弃用率最高的商家
+select Merchant_id
+    , sum(if(Date is null and Coupon_id is not null,1,0))/
+    sum(if(Coupon_id is not null,1,0)) as discard_rate
+from ccf_online_stage1_train
+where Date_received between '2016-06-01' and '2016-06-30'
+group by Merchant_id
+order by discard_rate desc
+limit 1
+
+6.
+select pH
+       ,`residual sugar`
+       ,rank()over(order by `residual sugar`) as ranklist
+from `winequality-white`
+where pH=3.63
+
+7.
+#找出市值最大的三个行业
+SELECT TYPE_ID
+, SUM(MARKET_VALUE)SUMVALUE
+FROM MARKET DATA
+GROUP BY TYPE_ID
+ORDER BY SUMVALUE
+LIMIT3
+
+#关联子查询
+SELECT TICKER_SYMBOL
+, TYPE_NAME_CN
+FROM (SELECT TICKER_SYMBOL, TYPE_NAME_CN, MARKET_VALUE,
+ROW_NUMBER()OVER(PARTITION BY TYPE_NAME_CN ORDER BY MARKET_VALUE)RANKVALUE
+FROM `market data`)A
+WHERE RANKVALUE <=3
+AND TYPE_NAME_CN IN 
+(SELECT TYPE_NAME_CN
+ FROM 
+ 	(SELECT TYPE_NAME_CN,
+           SUM(MARKET_VALUE)
+      FROM `market data`
+      WHERE YEAR(END_DATE) = '2018-12-31'
+      GROUP BY TYPE_NAME_CN
+      ORDER BY SUM(MARKET_VALUE) DESC
+      LIMIT 3 )B
+ )
+
+#join
+SELECT BaseData.TICKER_SYMBOL
+, BaseData.TYPE_NAME_CN
+FROM
+    (SELECT TYPE_NAME_CN
+        , SUM(MARKET_VALUE)
+FROM `market data`
+WHERE YEAR(END_DATE) = '2018-12-31'
+GROUP BY TYPE_NAME_CN
+ORDER BY SUM(MARKET_VALUE) DESC
+LIMIT 3)top3Type
+LEFT JOIN
+(SELECT TICKER_SYMBOL
+             ,TYPE_NAME_CN
+             ,MARKET_VALUE
+             ,row_number()OVER(PARTITION BY TYPE_NAME_CN ORDER BY MARKET_VALUE)CompanyRanking
+FROM `market data`)BaseData
+ON BaseData.TYPE_NAME_CN = top3Type.TYPE_NAME_CN
+WHERE CompanyRanking <=3
+
+
+8.
+#user_id并不能保证都有online和offline消费，用union all而不用join
+select User_id, sum(usagesum)amount
+from (select User_id
+           ,sum(if(Date is not null and Coupon_id is not null ,1,0))usagesum
+      from ccf_online_stage1_train
+      where year(Date)=2016 and month(Date)=6
+      group by User_id
+    union all
+    select User_id
+            ,sum(if(Date is not null and Coupon_id is not null ,1,0))usagesum
+      from ccf_offline_stage1_train
+      where year(Date)=2016 and month(Date)=6
+      group by User_id
+)A
+group by User_id
+order by amount desc
+limit 1
+
+9.
+#最高季度正好是一季度
+SELECT *
+ FROM (SELECT TICKER_SYMBOL,
+ YEAR(END_DATE) Year,
+ QUARTER(END_DATE) QUARTER,
+ SUM(VALUE) Amount
+ FROM `company operating`
+ WHERE INDIC_NAME_EN = 'Baiyun Airport:Passenger throughput'
+ GROUP BY TICKER_SYMBOL,YEAR(END_DATE),QUARTER(END_DATE)
+ ORDER BY SUM(VALUE) DESC
+ LIMIT 1 ) BaseData
+ LEFT JOIN -- income statement
+ (SELECT TICKER_SYMBOL,
+ YEAR(END_DATE) Year,
+ QUARTER(END_DATE) QUARTER,
+ SUM(N_INCOME) Amount
+ FROM `income statement`
+ GROUP BY TICKER_SYMBOL,YEAR(END_DATE),QUARTER(END_DATE) ) Income
+ ON BaseData.TICKER_SYMBOL = Income.TICKER_SYMBOL
+AND BaseData.Year = Income.Year
+ AND BaseData.QUARTER = Income.QUARTER
+
+10.
+select Merchant_id, sum(subdiscount)discount
+from(select Merchant_id
+        ,sum(substring_index(Discount_rate,':',-1))subdiscount
+from ccf_online_stage1_train
+where (Date is not null and Coupon_id is not null)
+     and Date between '2016-06-01' and '2016-06-30'
+group by Merchant_id
+union all
+select Merchant_id
+       ,sum(substring_index(Discount_rate,':',-1))subdiscount
+from ccf_offline_stage1_train
+where (Date is not null and Coupon_id is not null)
+     and Date between '2016-06-01' and '2016-06-30'
+group by Merchant_id)sub
+group by Merchant_id
+order by discount desc
+limit 3
+
+
+
+
+
+
+
+
+
